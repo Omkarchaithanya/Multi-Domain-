@@ -1,0 +1,115 @@
+Claude API Best Practices
+
+1. Prompt Engineering
+
+Effective Prompts:
+- Be specific about the task
+- Provide context and background
+- Show examples if helpful
+- Define the output format
+- Specify any constraints or requirements
+
+Example:
+Good: "Summarize this customer support ticket in 2-3 sentences, focusing on the main issue and what action is needed."
+Poor: "Summarize this ticket"
+
+2. System Prompts
+
+Use system prompts to define Claude's behavior:
+- Describe the role or persona
+- Set guidelines for responses
+- Define output format
+- Specify tone and style
+
+Example:
+"You are a helpful support agent. Keep responses concise (under 100 words). 
+Always be professional and empathetic. Provide specific solutions when possible."
+
+3. Handling Long Contexts
+
+For documents over 20k tokens:
+- Break into sections
+- Prioritize relevant sections first
+- Use summaries of less important parts
+- Reference specific sections by title
+
+4. Error Handling
+
+Common errors and solutions:
+- 429 Too Many Requests: Implement exponential backoff
+- 500 Server Error: Retry with increasing delays
+- 401 Unauthorized: Check API key validity
+- 400 Bad Request: Validate request format
+
+Example retry logic:
+max_retries = 3
+retry_delay = 1
+for attempt in range(max_retries):
+    try:
+        response = client.messages.create(...)
+        return response
+    except RateLimitError:
+        retry_delay *= 2
+        sleep(retry_delay)
+
+5. Cost Optimization
+
+- Use Haiku for simple tasks to save costs
+- Cache repeated requests where possible
+- Batch similar requests together
+- Monitor token usage with logging
+
+6. Security
+
+- Never log or expose API keys
+- Use environment variables for sensitive data
+- Validate user inputs before sending to API
+- Implement request validation
+- Rate limit your API to prevent abuse
+
+7. Streaming Responses
+
+For long responses, use streaming:
+
+stream = client.messages.stream(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[...],
+    system="..."
+)
+
+with stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+
+8. Vision Best Practices
+
+- Use JPEG for photos, PNG for screenshots
+- Keep images under 5MB
+- Provide context about the image
+- Ask specific questions about the image
+- Multiple images can be processed in one request
+
+9. Tool Use Patterns
+
+Define clear tool descriptions:
+- Explain what the tool does
+- List all parameters clearly
+- Provide examples of when to use it
+- Specify expected output format
+
+10. Multi-turn Conversations
+
+Maintain conversation history:
+{
+  "messages": [
+    {"role": "user", "content": "What is AI?"},
+    {"role": "assistant", "content": "..."},
+    {"role": "user", "content": "Tell me more about machine learning"}
+  ]
+}
+
+Key points:
+- Each turn includes full history
+- Context window grows with each turn
+- Manage context to stay within limits

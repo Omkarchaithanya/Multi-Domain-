@@ -1,0 +1,6 @@
+{
+  "source": "en_articles_8606394-how-large-is-the-context-window-on-paid-claude-plans_1.json",
+  "domain": "claude",
+  "text": "context around your project, key guidelines, and Claude's role. Keep project instructions concise: Claude performs best when you use project instructions for general context around your project, key guidelines, and Claude's role. Manage tools and connectors: These features are token-intensive, so being mindful of how many you have active helps maximize your available context. Manage tools and connectors: These features are token-intensive, so being mindful of how many you have active helps maximize your available context.",
+  "url": "https://support.claude.com/en/articles/8606394-how-large-is-the-context-window-on-paid-claude-plans"
+}

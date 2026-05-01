@@ -1,0 +1,104 @@
+HackerRank Troubleshooting Guide
+
+SUBMISSION FAILURES
+
+Problem: Code compiles locally but fails on HackerRank
+Causes:
+- Different environment/library versions
+- Incorrect input/output format
+- Unhandled edge cases
+- Platform-specific behavior
+
+Solution Steps:
+1. Review test case examples carefully
+2. Check input constraints and data ranges
+3. Test with maximum constraint values
+4. Verify output format exactly (spaces, newlines, precision)
+5. Check for integer overflow in calculations
+6. Test on HackerRank's online editor before final submission
+
+Problem: Time Limit Exceeded (TLE)
+Causes:
+- Inefficient algorithm (O(n²) instead of O(n log n))
+- Infinite loops
+- Unbounded recursion
+
+Solutions:
+- Profile code to find bottlenecks
+- Consider dynamic programming for recursive problems
+- Use efficient data structures (hash tables, heaps)
+- Optimize I/O operations
+- Consider mathematical shortcuts instead of iteration
+
+Problem: Memory Limit Exceeded (MLE)
+Causes:
+- Creating very large data structures
+- Memory leaks in recursive functions
+- Storing entire input when partial processing possible
+
+Solutions:
+- Process input in chunks
+- Use generators instead of lists where possible
+- Free memory after use
+- Consider iterative approaches instead of recursive
+
+ACCOUNT ISSUES
+
+Problem: Cannot login to account
+Solutions:
+- Reset password via "Forgot Password" link
+- Check if email is verified
+- Try different browser or incognito mode
+- Clear browser cache and cookies
+- Contact support if 2FA is not working
+
+Problem: Submissions not showing up
+Solutions:
+- Refresh page or clear cache
+- Check if using correct account
+- Verify internet connection
+- Check if challenge is still open
+
+Problem: Points not updating
+Solutions:
+- Points update within 5 minutes
+- Check submission status
+- Verify you passed all test cases
+- Check for any penalties
+
+TECHNICAL ISSUES
+
+Problem: API returns 403 Forbidden
+Solution: Check token scope permissions in OAuth settings
+
+Problem: Connection timeout
+Solutions:
+- Check internet speed
+- Try from different network
+- Reduce request size
+- Contact support if persistent
+
+Problem: Downloaded solutions showing old code
+Solution: Clear browser cache, use browser developer tools to force refresh
+
+PERFORMANCE OPTIMIZATION
+
+For language-specific optimization:
+Python: Use list comprehensions, avoid string concatenation in loops, use built-in functions
+Java: Use StringBuilder instead of String concatenation, avoid unnecessary object creation
+C++: Use fast I/O (ios::sync_with_stdio(false)), reserve vector space
+
+DEBUG TECHNIQUES
+
+1. Add print statements to trace execution
+2. Use smaller test cases to debug logic
+3. Step through code manually on paper
+4. Check boundary conditions (0, 1, -1, max_value)
+5. Verify algorithm on simple examples first
+
+PLATFORM FEATURES
+
+Discuss threads: Available in most challenges, search by challenge name
+Leaderboards: Ranked by points and speed
+Badges: Earned for various achievements
+Contests: Compete in real-time events

@@ -1,0 +1,170 @@
+Visa Payment Integration Guide
+
+1. API Endpoints
+
+Payment Authorization:
+POST /visadirect/infoswitch/v1/authorizations
+Authorize a transaction before processing
+
+Payment Settlement:
+POST /visadirect/infoswitch/v1/settlements
+Complete an authorized transaction
+
+Transaction Inquiry:
+GET /visadirect/infoswitch/v1/transactions/{transactionId}
+Query transaction status
+
+Reversal:
+POST /visadirect/infoswitch/v1/reversals
+Reverse a previously authorized transaction
+
+2. Authentication
+
+Mutual TLS (mTLS):
+- Client certificate required
+- Server certificate verification
+- All communication encrypted
+
+API Key in Header:
+X-API-Key: YOUR_API_KEY
+
+3. Request Format
+
+Authorization Request:
+{
+  "acquirerCountryCode": "840",
+  "acquiringBin": "408999",
+  "amount": "10000",
+  "businessApplicationId": "CI",
+  "cardAcceptor": {
+    "address": {
+      "city": "San Francisco",
+      "country": "USA",
+      "state": "CA",
+      "zipCode": "94105"
+    },
+    "idCode": "ABCD1234",
+    "name": "Merchant Name",
+    "terminalId": "TERM123"
+  },
+  "cavv": "0700100038DCC00000B15D",
+  "cavvAlgorithm": "05",
+  "currencyCode": "840",
+  "cvv2": "123",
+  "foreignExchangeFeeTransaction": false,
+  "messageReasonCode": "1100",
+  "pointOfServiceData": {
+    "motoIndicator": false,
+    "panEntryMode": "052"
+  },
+  "retrievalReferenceNumber": "330000050000",
+  "senderCardNumber": "4111111111111111",
+  "senderCurrencyCode": "840",
+  "systemsTraceAuditNumber": "451001",
+  "transactionCurrencyCode": "840",
+  "transactionIdentifier": "381228649430011",
+  "transactionType": "3200"
+}
+
+4. Response Codes
+
+Success: 00 - Approved
+Decline: 05 - General Decline
+Expired Card: 04 - Pick Up Card
+Invalid Amount: 13 - Invalid Amount
+Insufficient Funds: 51 - Insufficient Funds
+Invalid CVC: 86 - Invalid CVV
+
+5. Settlement Process
+
+1. Authorize transaction
+2. Receive acquirer reference number
+3. Within 48 hours, submit settlement request
+4. Funds transferred per batch schedule
+5. Reconciliation report provided
+
+6. Security Requirements
+
+- Store cards securely or use tokenization
+- Never log full card numbers
+- Implement PCI DSS compliance
+- Use encrypted transmission
+- Implement 3D Secure for online transactions
+
+7. Tokenization Service
+
+Create a token instead of storing card:
+
+POST /visadirect/infoswitch/v1/tokens
+{
+  "cardNumber": "4111111111111111",
+  "expiryMonth": "12",
+  "expiryYear": "2027",
+  "cvv": "123"
+}
+
+Response:
+{
+  "token": "VISA_TOKEN_123456789",
+  "tokenAssuranceLevel": "HIGH"
+}
+
+Use token in future transactions instead of card number.
+
+8. Error Handling
+
+Invalid Merchant:
+HTTP 400: {"error": "Invalid merchant ID", "code": "1000"}
+
+Rate Limit Exceeded:
+HTTP 429: {"error": "Rate limit exceeded", "retryAfter": 60}
+
+Authentication Failed:
+HTTP 401: {"error": "Authentication failed", "code": "401"}
+
+9. Testing
+
+Test Card Numbers:
+- 4111111111111111: Valid card
+- 5555555555554444: MasterCard
+- 378282246310005: AmEx
+
+Test Amounts:
+- Under $500: Approved
+- $500-$900: Declined
+- Over $900: Refer to issuer
+
+10. Webhook Notifications
+
+POST to your webhook URL when:
+- Transaction authorized
+- Settlement completed
+- Transaction reversed
+- Chargeback received
+
+Include timestamp, signature verification, and retry logic.
+
+11. Compliance
+
+Regional Requirements:
+- Americas: NACHA, ACH
+- Europe: SEPA
+- Asia-Pacific: Local regulations per country
+
+PCI DSS Level:
+- Level 1: Visa Direct eligible
+- Enterprise access required
+
+12. Common Issues
+
+Declined Transactions:
+- Verify card details accuracy
+- Check authorization was successful
+- Ensure settlement attempted within 48 hours
+- Verify merchant account status
+
+Settlement Failures:
+- Check bank account validity
+- Verify ACH information
+- Confirm batch timing
+- Review error logs

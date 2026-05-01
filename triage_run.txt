@@ -1,0 +1,134 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1777627111.978591   22020 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1777627118.517721   22020 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING:tensorflow:From C:\Users\omkar\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+[triage] Building corpus indexes...
+[corpus] Attempting to load from: C:\Users\omkar\Downloads\MultiΓÇæDomain\data
+[corpus] data_dir exists. Contents:
+  - claude (dir)
+  - hackerrank (dir)
+  - visa (dir)
+[corpus]   hackerrank api_documentation.txt                             
+[corpus]   hackerrank troubleshooting_guide.txt                         
+[corpus] hackerrank   loaded   2 files ΓåÆ    4 chunks
+[corpus]   claude     api_reference.txt                                 
+[corpus]   claude     best_practices.txt                                
+[corpus] claude       loaded   2 files ΓåÆ    4 chunks
+[corpus]   visa       payment_integration.txt                           
+[corpus]   visa       troubleshooting.txt                               
+[corpus] visa         loaded   2 files ΓåÆ    6 chunks
+[corpus] Total chunks indexed: 14
+[corpus] Loading sentence-transformers model: all-MiniLM-L6-v2...
+[corpus] Γ£ô Sentence-Transformers model loaded successfully
+[triage] Indexed 14 chunks across 3 domains (semantic=all-MiniLM-L6-v2).
+[ESCALATION] No rules triggered - REPLY
+[ESCALATION] Rule: HIGH_RISK_PATTERNS (critical_outage)
+[ESCALATION] No rules triggered - REPLY
+[ESCALATION] No rules triggered - REPLY
+[ESCALATION] No rules triggered - REPLY
+[ESCALATION] No rules triggered - REPLY
+[ESCALATION] No rules triggered - REPLY
+[ESCALATION] Fraud FAQ matched - REPLY
+[ESCALATION] Fraud FAQ matched - REPLY
+[ESCALATION] No rules triggered - REPLY
+[triage] Sample validation: {'sample_rows': 10, 'domain_accuracy': 0.7, 'action_accuracy': 1.0}
+[triage] Processing 29 tickets from C:\Users\omkar\Downloads\MultiΓÇæDomain\support_tickets\support_tickets\support_tickets.csv...
+
+[DIAG] Ticket ticket-001 retrieval scores:
+  - best_practices.txt             score=0.787 domain=claude
+  - best_practices.txt             score=0.683 domain=claude
+  - api_reference.txt              score=0.458 domain=claude
+[ESCALATION] Rule: HIGH_RISK_PATTERNS (identity_verification_lockout)
+[DIAG] Confidence=0.847 (domain=0.95, request=0.8, retrieval=0.7875)
+[DIAG] Escalation=True (identity_verification_lockout)
+[ticket-001] claude | permissions | escalate
+
+[DIAG] Ticket ticket-002 retrieval scores:
+  - api_documentation.txt          score=0.866 domain=hackerrank
+  - troubleshooting_guide.txt      score=0.554 domain=hackerrank
+  - api_documentation.txt          score=0.452 domain=hackerrank
+[ESCALATION] No rules triggered - REPLY
+[DIAG] Confidence=0.914 (domain=0.95, request=0.94, retrieval=0.8662)
+[DIAG] Escalation=False (covered_by_documentation)
+[ticket-002] hackerrank | assessment | reply
+
+[DIAG] Ticket ticket-003 retrieval scores:
+  - troubleshooting.txt            score=0.888 domain=visa
+  - troubleshooting.txt            score=0.729 domain=visa
+  - payment_integration.txt        score=0.625 domain=visa
+[ESCALATION] Rule: billing_requires_account_lookup
+[DIAG] Confidence=0.87 (domain=0.95, request=0.73, retrieval=0.8878)
+[DIAG] Escalation=True (billing_requires_account_lookup)
+[ticket-003] visa | billing | escalate
+
+[DIAG] Ticket ticket-004 retrieval scores:
+  - api_documentation.txt          score=0.823 domain=hackerrank
+  - api_documentation.txt          score=0.650 domain=hackerrank
+  - troubleshooting_guide.txt      score=0.605 domain=hackerrank
+[ESCALATION] Rule: HIGH_RISK_PATTERNS (account_lookup_billing_dispute)
+[DIAG] Confidence=0.827 (domain=0.95, request=0.66, retrieval=0.8227)
+[DIAG] Escalation=True (account_lookup_billing_dispute)
+[ticket-004] hackerrank | billing | escalate
+[ESCALATION] No rules triggered - REPLY
+[ticket-005] hackerrank | billing | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-006] hackerrank | assessment | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-007] hackerrank | bug_report | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-008] hackerrank | assessment | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-009] hackerrank | assessment | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-010] hackerrank | assessment | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-011] hackerrank | assessment | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-012] claude | faq | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-013] hackerrank | faq | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-014] hackerrank | billing | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-015] claude | bug_report | reply
+[ESCALATION] Rule: fraud_requires_human_review
+[ticket-016] visa | fraud | escalate
+[ESCALATION] No rules triggered - REPLY
+[ticket-017] hackerrank | bug_report | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-018] hackerrank | assessment | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-019] visa | billing | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-020] claude | bug_report | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-021] claude | feature_request | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-022] visa | billing | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-023] claude | faq | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-024] claude | feature_request | reply
+[ESCALATION] Rule: fraud_requires_human_review
+[ticket-025] visa | fraud | escalate
+[ESCALATION] No rules triggered - REPLY
+[ticket-026] claude | bug_report | reply
+[ESCALATION] Rule: permissions_account_issue
+[ticket-027] hackerrank | permissions | escalate
+[ESCALATION] No rules triggered - REPLY
+[ticket-028] claude | feature_request | reply
+[ESCALATION] No rules triggered - REPLY
+[ticket-029] visa | billing | reply
+[triage] Wrote C:\Users\omkar\Downloads\MultiΓÇæDomain\support_tickets\support_tickets\output.csv
+[triage] Appended structured log to C:\Users\omkar\Downloads\MultiΓÇæDomain\support_tickets\support_tickets\log.txt
+
+[triage] Request Type Distribution:
+  assessment             7
+  billing                7
+  bug_report             5
+  faq                    3
+  feature_request        3
+  fraud                  2
+  permissions            2

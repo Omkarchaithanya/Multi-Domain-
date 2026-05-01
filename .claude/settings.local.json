@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(Get-ChildItem -Recurse \"c:\\\\Users\\\\omkar\\\\Downloads\\\\Multi‑Domain\\\\code\\\\\" -File | Select-Object -ExpandProperty FullName | Sort-Object)",
+      "Bash(python code/scraper.py)"
+    ]
+  }
+}

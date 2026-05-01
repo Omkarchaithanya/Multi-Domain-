@@ -1,0 +1,6 @@
+{
+  "source": "en_articles_13119606-managing-skills-as-an-admin_3.json",
+  "domain": "claude",
+  "text": "purpose at a glance. Write clear descriptions: The skill's description helps Claude determine when to use it automatically. Ensure descriptions accurately reflect what the skill does. Write clear descriptions: The skill's description helps Claude determine when to use it automatically. Ensure descriptions accurately reflect what the skill does. Consider default status carefully: Enable skills by default when they're broadly useful to most users. Use disabled by default for specialized skills that only some team members need. Consider default status carefully: Enable skills by default when they're broadly useful to most users. Use disabled by default for specialized skills that only some team members need. Decide on sharing deliberately: Peer-to-org sharing has no approval step. If you want to review skills before they reach everyone, keep org-wide sharing off and ask members to submit skills to an owner for provisioning instead. Decide on sharing deliberately: Peer-to-org sharing has no approval step. If you want to review skills before they reach everyone, keep org-wide sharing off and ask members to submit skills to an owner for provisioning instead.",
+  "url": "https://support.claude.com/en/articles/13119606-managing-skills-as-an-admin"
+}

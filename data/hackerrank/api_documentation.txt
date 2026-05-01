@@ -1,0 +1,82 @@
+HackerRank API Documentation
+
+1. Authentication
+HackerRank uses OAuth 2.0 for authentication. All API requests must include a Bearer token in the Authorization header.
+Authorization: Bearer YOUR_ACCESS_TOKEN
+
+To obtain an access token:
+- Register at https://www.hackerrank.com/developers
+- Create an application
+- Use the provided client_id and client_secret in OAuth flow
+
+2. User Management Endpoints
+
+GET /api/v1/users/{user_id}
+Returns user profile information including name, email, username, reputation score, and account status.
+Parameters: user_id (required)
+Response: User object with fields: id, username, email, created_at, reputation, badges
+
+POST /api/v1/users/{user_id}/profile
+Update user profile information. Requires authentication.
+Parameters: name, bio, avatar_url (optional)
+Response: Updated user object
+
+GET /api/v1/users/{user_id}/submissions
+Lists all submissions made by the user.
+Parameters: user_id (required), limit (optional, default 20), offset (optional, default 0)
+Response: Array of submission objects
+
+3. Challenges Endpoints
+
+GET /api/v1/challenges
+List available challenges with filters
+Query parameters: category, difficulty, status, language
+Response: Array of challenge objects including title, description, difficulty, acceptance_rate
+
+GET /api/v1/challenges/{challenge_id}
+Get detailed challenge information
+Parameters: challenge_id (required)
+Response: Challenge object with problem statement, test cases, constraints
+
+POST /api/v1/challenges/{challenge_id}/submit
+Submit a solution to a challenge
+Parameters: challenge_id (required), solution (code as string), language (python, java, cpp, etc.)
+Response: Submission object with status (pending, accepted, rejected, error)
+
+4. Scoring System
+- Easy challenges: 5 points
+- Medium challenges: 10 points
+- Hard challenges: 15 points
+- Bonus points for speed and code efficiency
+- Penalty for wrong submissions: -1 point per attempt
+
+5. Rate Limiting
+API rate limit: 1000 requests per hour per user
+Rate limit headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+
+6. Error Codes
+400: Bad Request - Invalid parameters
+401: Unauthorized - Invalid or expired token
+403: Forbidden - User lacks permission
+404: Not Found - Resource does not exist
+429: Too Many Requests - Rate limit exceeded
+500: Internal Server Error
+
+7. Common Issues and Solutions
+
+Issue: "Invalid token" error
+Solution: Ensure token is not expired. Refresh token using OAuth flow.
+
+Issue: "Challenge submission failed"
+Solution: Verify code syntax, ensure all test cases are handled, check language compatibility.
+
+Issue: "Rate limit exceeded"
+Solution: Implement exponential backoff, cache responses where possible, contact support for higher limits.
+
+8. Webhooks
+HackerRank supports webhooks for real-time notifications:
+- submission.completed
+- challenge.updated
+- user.achievement_unlocked
+
+Register webhooks in dashboard under API settings.

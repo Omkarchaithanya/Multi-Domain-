@@ -23,13 +23,17 @@ from tone_detector import detect_tone
 from response_generator import UNCOVERED_RESPONSE, generate_response, verify_grounding
 from retriever import retrieve
 from logger import StructuredLogger
+import retriever
 
 
-OUTPUT_FIELDS = ["ticket_id", "request_type", "product_area", "action", "retrieved_docs", "response"]
+OUTPUT_FIELDS = ["ticket_id", "status", "product_area", "justification", "retrieved_docs", "response", "request_type"]
 ESCALATION_RESPONSE = "This issue requires attention from a specialist. A human support agent will review your case and follow up shortly."
 
 
 def main() -> None:
+    # Reset diversity tracker so each run starts fresh
+    retriever._used_top_chunks = set()
+
     data_dir = ROOT_DIR / "data"
     ticket_dir = _find_ticket_dir(ROOT_DIR)
     input_path = ticket_dir / "support_tickets.csv"
@@ -71,7 +75,7 @@ def main() -> None:
     for idx, row in enumerate(rows, start=1):
         result = process_ticket(row, idx, indexer, log_path, structured_logger)
         results.append(result)
-        print(f"[{result['ticket_id']}] {result['product_area']} | {result['request_type']} | {result['action']}")
+        print(f"[{result['ticket_id']}] {result['product_area']} | {result['request_type']} | {result['status']}")
 
     with output_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=OUTPUT_FIELDS)
@@ -80,14 +84,14 @@ def main() -> None:
 
     structured_logger.log_event("run_complete", {
         "tickets": len(results),
-        "reply": sum(1 for row in results if row["action"] == "reply"),
-        "escalate": sum(1 for row in results if row["action"] == "escalate"),
+        "replied": sum(1 for row in results if row["status"] == "replied"),
+        "escalated": sum(1 for row in results if row["status"] == "escalated"),
         "output": str(output_path),
     })
     _log_event(log_path, "run_complete", {
         "tickets": len(results),
-        "reply": sum(1 for row in results if row["action"] == "reply"),
-        "escalate": sum(1 for row in results if row["action"] == "escalate"),
+        "replied": sum(1 for row in results if row["status"] == "replied"),
+        "escalated": sum(1 for row in results if row["status"] == "escalated"),
         "output": str(output_path),
     })
     print(f"[triage] Wrote {output_path}")
@@ -128,12 +132,26 @@ def process_ticket(
     # Domain routing
     domain, domain_confidence, domain_reason = route_domain_with_confidence(ticket_text)
     
-    # Request type classification
-    request_type, request_confidence = classify_request_type_with_confidence(ticket_text)
-    
+    # Request type classification (internal fine-grained label used for routing)
+    _request_type_raw, request_confidence = classify_request_type_with_confidence(ticket_text)
+
+    # FIX 3: Remap to 4-label output taxonomy — only applied at output stage
+    _REQUEST_TYPE_MAP = {
+        "faq":            "product_issue",
+        "billing":        "product_issue",
+        "account_access": "product_issue",
+        "fraud":          "product_issue",
+        "permissions":    "product_issue",
+        "assessment":     "product_issue",
+        "bug_report":     "bug",
+        "feature_request": "feature_request",
+        "other":          "invalid",
+    }
+    request_type = _REQUEST_TYPE_MAP.get(_request_type_raw, "product_issue")
+
     # Retrieval
     chunks = retrieve(ticket_text, domain, indexer)
-    
+
     # Diagnostic output for first 4 tickets
     if idx <= 4:
         print(f"\n[DIAG] Ticket {ticket_id} retrieval scores:")
@@ -141,13 +159,13 @@ def process_ticket(
             print(f"  - {chunk.get('source', 'unknown'):30} score={chunk.get('score', 0.0):.3f} domain={chunk.get('domain', '?')}")
         if not chunks:
             print(f"  - No chunks retrieved")
-    
+
     # Innovation 2: Adversarial Safety Check
     safety_verdict, safety_reason = adversarial_check(ticket_text)
     safety_should_escalate = safety_verdict != "safe"
-    
-    # Basic escalation decision
-    should_escalate, escalation_reason = escalation_decision(ticket_text, request_type, chunks)
+
+    # Basic escalation decision — uses internal fine-grained type for routing rules
+    should_escalate, escalation_reason = escalation_decision(ticket_text, _request_type_raw, chunks)
     
     # Combine safety and escalation decisions
     if safety_should_escalate:
@@ -165,10 +183,10 @@ def process_ticket(
         print(f"[DIAG] Confidence={confidence} (domain={domain_confidence}, request={request_confidence}, retrieval={retrieval_confidence})")
         print(f"[DIAG] Escalation={should_escalate} ({escalation_reason})")
 
-    action = "escalate" if should_escalate else "reply"
+    status = "escalated" if should_escalate else "replied"
     grounding_score = None
     grounding_verdict = "n/a"
-    
+
     if should_escalate:
         response = ESCALATION_RESPONSE
         source_citation = _retrieved_docs(chunks[:3])
@@ -178,7 +196,7 @@ def process_ticket(
         # Generate response with tone adaptation
         response = generate_response(ticket_text, chunks, tone)
         if response == UNCOVERED_RESPONSE:
-            action = "escalate"
+            status = "escalated"
             escalation_reason = "response_generator_uncovered"
             response = ESCALATION_RESPONSE
             source_citation = _retrieved_docs(chunks[:3])
@@ -189,13 +207,25 @@ def process_ticket(
             grounding_score, grounding_verdict, _ = verify_grounding(response, chunks)
 
     retrieved_docs = _retrieved_docs(chunks)
+
+    # FIX 2: Build justification
+    if status == "escalated":
+        justification = f"Escalated: {escalation_reason}"
+    else:
+        top_source = chunks[0]["source"] if chunks else "none"
+        justification = (
+            f"Replied using corpus ({domain}): top source {top_source}, "
+            f"retrieval score {retrieval_confidence:.2f}"
+        )
+
     result = {
-        "ticket_id": ticket_id,
-        "request_type": request_type,
-        "product_area": domain,
-        "action": action,
+        "ticket_id":     ticket_id,
+        "status":        status,
+        "product_area":  domain,
+        "justification": justification,
         "retrieved_docs": retrieved_docs,
-        "response": response,
+        "response":      response,
+        "request_type":  request_type,
     }
 
     # Extract domain signals for logging
@@ -216,8 +246,8 @@ def process_ticket(
         grounding_score=grounding_score,
         grounding_verdict=grounding_verdict,
         request_type=request_type,
-        action=action,
-        escalation_reason=escalation_reason if should_escalate else None,
+        action=status,
+        escalation_reason=escalation_reason if status == "escalated" else None,
     )
 
     # Also log to JSON log for backward compatibility
@@ -226,6 +256,7 @@ def process_ticket(
         "domain": domain,
         "domain_confidence": domain_confidence,
         "domain_reason": domain_reason,
+        "request_type_internal": _request_type_raw,
         "request_type": request_type,
         "request_confidence": request_confidence,
         "tone": tone,
@@ -242,7 +273,7 @@ def process_ticket(
             for chunk in chunks
         ],
         "confidence": confidence,
-        "action": action,
+        "status": status,
         "escalation_reason": escalation_reason,
         "response": response,
     })
@@ -293,7 +324,7 @@ def _validate_sample(sample_path: Path, indexer: CorpusIndexer, log_path: Path) 
             request_type, _ = classify_request_type_with_confidence(ticket_text)
             chunks = retrieve(ticket_text, predicted_domain, indexer)
             predicted_escalate, _ = escalation_decision(ticket_text, request_type, chunks)
-            predicted_action = "escalate" if predicted_escalate else "reply"
+            predicted_action = "escalated" if predicted_escalate else "replied"
             if predicted_action == expected_action:
                 action_hits += 1
             else:
@@ -395,9 +426,9 @@ def _normalize_domain(value: str) -> str:
 def _expected_action(row: Dict[str, str]) -> str:
     status = (row.get("Status") or "").lower()
     if "escalat" in status:
-        return "escalate"
+        return "escalated"
     if "repl" in status or "resolved" in status:
-        return "reply"
+        return "replied"
     return ""
 
 
@@ -520,7 +551,7 @@ def run_test_mode() -> None:
         "Company": "HackerRank",
     }
     output = process_ticket(sample_row, 1, indexer, ROOT_DIR / "test.log", StructuredLogger(ROOT_DIR / "test.log"))
-    required_keys = ["ticket_id", "request_type", "product_area", "action", "retrieved_docs", "response"]
+    required_keys = ["ticket_id", "status", "product_area", "justification", "retrieved_docs", "response", "request_type"]
     test5_pass = True
     missing_keys = []
     for key in required_keys:

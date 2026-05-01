@@ -4,9 +4,27 @@ import numpy as np
 
 from corpus_indexer import CorpusIndexer, tokenize
 
+# Tracks chunk_ids that have already been returned as the top result for a
+# previous ticket in the same run, enabling diversity penalty logic.
+_used_top_chunks: set = set()
+
 
 def retrieve(ticket_text: str, domain: str, indexer: CorpusIndexer) -> List[Dict]:
     chunks = _hybrid_retrieve(ticket_text, domain, indexer)
+
+    # Diversity penalty: chunks already used as a top result get 35% score cut
+    for chunk in chunks:
+        if chunk["chunk_id"] in _used_top_chunks:
+            chunk["score"] = round(chunk["score"] * 0.65, 4)
+
+    # Re-sort after penalty
+    chunks.sort(key=lambda x: x["score"], reverse=True)
+
+    # Register the new top chunk so it can be penalised for future tickets
+    if chunks:
+        _used_top_chunks.add(chunks[0]["chunk_id"])
+
+    # Query expansion fallback (unchanged)
     if not chunks or chunks[0]["score"] < 0.22:
         expanded = _expand_query(ticket_text, domain)
         if expanded != ticket_text:
@@ -14,6 +32,7 @@ def retrieve(ticket_text: str, domain: str, indexer: CorpusIndexer) -> List[Dict
             chunks = _merge_ranked_lists(chunks, retry)[:5]
             for chunk in chunks:
                 chunk["multi_hop"] = True
+
     return chunks[:5]
 
 

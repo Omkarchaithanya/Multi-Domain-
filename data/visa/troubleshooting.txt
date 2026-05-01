@@ -1,0 +1,190 @@
+Visa API Troubleshooting
+
+TRANSACTION ISSUES
+
+Problem: Transaction keeps getting declined
+Root Causes:
+- Invalid card number
+- Expired card
+- Incorrect CVV
+- Card not enabled for online transactions
+- Merchant category not supported
+- Fraud detection triggered
+
+Solutions:
+1. Verify card number using Luhn algorithm
+2. Check expiry date is valid
+3. Confirm CVV format (3-4 digits)
+4. Contact issuing bank about restrictions
+5. Check merchant category code (MCC)
+6. Verify transaction amount
+7. Try different card if available
+
+Problem: Authorization successful but settlement fails
+Causes:
+- Settlement attempted after 48 hours
+- Merchant account closed/inactive
+- ACH information invalid
+- Batch processing error
+- Network connectivity issue
+
+Solutions:
+1. Attempt settlement within 24 hours of authorization
+2. Verify merchant account status in dashboard
+3. Update ACH/bank account details
+4. Check batch submission logs
+5. Contact Visa support if persistent
+
+Problem: Timeout during transaction
+Causes:
+- Network connectivity issues
+- API endpoint under load
+- Request too large
+- SSL/TLS handshake failure
+- Client timeout too short
+
+Solutions:
+1. Implement retry logic with exponential backoff
+2. Verify network connectivity
+3. Check request size and reduce if possible
+4. Ensure client certificate is valid
+5. Increase timeout threshold (minimum 30 seconds recommended)
+
+AUTHENTICATION ISSUES
+
+Problem: Authentication fails with certificate error
+Solutions:
+- Verify certificate is not expired
+- Check certificate chain is complete
+- Ensure private key matches certificate
+- Update certificate before expiry
+- Test certificate validity with openssl:
+  openssl s_client -connect api.visa.com:443 -cert client.pem -key client-key.pem
+
+Problem: Invalid API key error
+Solutions:
+- Confirm API key copied completely
+- Check for extra whitespace
+- Verify using correct API endpoint
+- Regenerate key if suspected compromise
+- Check key permissions/scopes
+
+INTEGRATION ISSUES
+
+Problem: Tokenization returns invalid token
+Causes:
+- Card details incorrect
+- Card not eligible for tokenization
+- Merchant not authorized
+- Card already tokenized
+
+Solutions:
+- Verify card passes Luhn check
+- Check card issuer supports tokenization
+- Confirm merchant tokenization permissions
+- Retrieve existing token if already created
+
+Problem: Webhook notifications not received
+Causes:
+- Incorrect webhook URL
+- Webhook endpoint unreachable
+- Firewall blocking requests
+- SSL certificate validation failing
+- Incorrect authentication
+
+Solutions:
+1. Test webhook URL with curl/Postman
+2. Check firewall rules allow Visa IPs
+3. Verify SSL certificate is valid
+4. Check authentication credentials
+5. Review webhook logs in dashboard
+6. Implement signature verification
+
+SETTLEMENT ISSUES
+
+Problem: Funds not deposited to account
+Timing:
+- T+0: Transaction authorized
+- T+1: Settlement submitted
+- T+2 to T+5: Funds appear in account (depending on bank)
+
+Solutions if delayed:
+- Verify transaction status in portal
+- Check bank account details
+- Contact merchant bank
+- Verify settlement batch was submitted
+- Check for failed ACH returns
+
+Problem: Incorrect settlement amount
+Causes:
+- Partial reversals applied
+- Chargeback deducted
+- Fees applied
+- Currency conversion
+- Duplicate settlements
+
+Solutions:
+1. Review transaction audit trail
+2. Check for reversals or chargebacks
+3. Verify fee structure
+4. Confirm currency rates used
+5. Check for duplicate submissions
+
+ERROR CODES AND RECOVERY
+
+Common Response Codes:
+- 00: Success (no action needed)
+- 01: Contact Issuer (customer contacts bank)
+- 02: Pick Up Card (collect card - fraud alert)
+- 03: Invalid Merchant (verify MCC and account)
+- 04: Pick Up Card/Retain (same as 02)
+- 05: General Decline (customer gets new card)
+
+Permanent Declines (do not retry):
+- Invalid card number
+- Expired card
+- Card type not accepted
+
+Temporary Declines (can retry after delay):
+- Insufficient funds
+- Temporary hold
+- Issuer unavailable
+
+COMPLIANCE ISSUES
+
+Problem: PCI DSS audit failure
+Solutions:
+- Never store sensitive card data locally
+- Use tokenization for recurring transactions
+- Implement end-to-end encryption
+- Update security protocols
+- Complete annual PCI assessment
+
+PERFORMANCE OPTIMIZATION
+
+Rate Limiting:
+- Batch similar transactions together
+- Implement request queuing
+- Space out non-time-sensitive requests
+- Use webhook notifications instead of polling
+
+Caching:
+- Cache merchant configuration
+- Cache BIN information for card type
+- Cache tokenization results
+- Set TTL of 24-48 hours
+
+DEBUGGING TOOLS
+
+Enable detailed logging:
+- Log all request/response pairs
+- Include timestamp and request ID
+- Log authentication attempts
+- Record merchant/card details (tokenized)
+- Monitor response times
+
+Test transactions:
+- Use test card numbers
+- Verify both success and failure scenarios
+- Test edge cases (max/min amounts)
+- Verify settlement timing

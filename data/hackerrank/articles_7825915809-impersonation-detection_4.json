@@ -1,0 +1,6 @@
+{
+  "source": "articles_7825915809-impersonation-detection_4.json",
+  "domain": "hackerrank",
+  "text": "to filter candidates appropriately. Proctor Activity Suspicion Severity Proctor Activity Suspicion Severity Proctor Activity Suspicion Score Proctor Activity Suspicion Score Proctor Activity Reasons Proctor Activity Reasons High High 9 9 Multiple faces detected, No faces detected Multiple faces detected, No faces detected Medium Medium 7 7 Multiple faces detected Multiple faces detected Medium Medium 5 5 Multiple faces detected Multiple faces detected High Suspicion: Scores of 8-10 indicate high suspicion, such as multiple or no faces detected. High Suspicion: Scores of 8-10 indicate high suspicion, such as multiple or no faces detected. Medium Suspicion: Scores of 5-7 indicate moderate suspicion, like multiple faces or potential spoofing. Medium Suspicion: Scores of 5-7 indicate moderate suspicion, like multiple faces or potential spoofing. Low Suspicion: Scores below 5 indicate no significant issues. Low Suspicion: Scores below 5 indicate no significant issues. Note: When progressing candidates are flagged as Medium , it is recommended that further assessments be conducted to ensure that no cheating occurred in the previous rounds.",
+  "url": "https://support.hackerrank.com/articles/7825915809-impersonation-detection"
+}

@@ -183,6 +183,9 @@ class CorpusIndexer:
 
     def _json_to_text(self, value: object) -> str:
         if isinstance(value, dict):
+            # For our scraped-chunk format {source, domain, text, url}: use only 'text'
+            if "text" in value:
+                return str(value["text"])
             return " ".join(self._json_to_text(v) for v in value.values())
         if isinstance(value, list):
             return " ".join(self._json_to_text(v) for v in value)

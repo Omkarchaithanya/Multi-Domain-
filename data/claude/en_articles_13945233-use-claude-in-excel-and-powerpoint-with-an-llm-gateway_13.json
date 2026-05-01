@@ -1,0 +1,6 @@
+{
+  "source": "en_articles_13945233-use-claude-in-excel-and-powerpoint-with-an-llm-gateway_13.json",
+  "domain": "claude",
+  "text": "Claude model (Claude Sonnet 4.5 or later) is enabled in your account and region. For Foundry, confirm at least one Claude model is deployed in the resource (Model catalog). Streaming responses fail or hang Verify that your gateway supports Server-Sent Events (SSE) pass-through. Some proxy configurations strip or buffer SSE connections, which prevents streaming responses from reaching the add-in. A feature I expected isn't available Connectors, skills, file uploads, and Working Across Apps aren't available through third-party platforms yet. If you need these, ask your admin about signing in with a Claude account instead.",
+  "url": "https://support.claude.com/en/articles/13945233-use-claude-in-excel-and-powerpoint-with-an-llm-gateway"
+}
